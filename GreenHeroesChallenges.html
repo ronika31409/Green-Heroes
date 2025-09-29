@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Green Heroes — Challenges</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{font-family:Arial,sans-serif;background:#eef8f0;color:#233;padding:12px;}
+h1{color:#2d7a2d;text-align:center;margin:6px 0 12px;}
+label{display:block;margin-top:10px;font-weight:600;}
+select,input,button{width:100%;padding:10px;border-radius:8px;border:1px solid #cfd9cf;font-size:15px;margin-top:6px;}
+.panel{background:#fff;padding:12px;border-radius:10px;margin-top:12px;box-shadow:0 1px 0 rgba(0,0,0,.04);}
+.badge{font-weight:700;margin-top:6px;font-size:18px;}
+</style>
+</head>
+<body>
+
+<h1>🏆 Green Heroes — Challenges</h1>
+
+<div class="panel">
+  <label>Step 1: Choose Challenge Type</label>
+  <select id="challengeType" onchange="showLogInput()">
+    <option value="">— select —</option>
+    <option value="weekly">Weekly</option>
+    <option value="monthly">Monthly</option>
+  </select>
+
+  <div id="logInput" style="display:none;margin-top:10px;">
+    <label id="logLabel">Step 2: Log your progress</label>
+    <input id="logValue" type="number" min="0" placeholder="Enter number">
+    <button onclick="evaluateChallenge()" style="margin-top:10px;">Enter</button>
+  </div>
+
+  <div id="result" style="margin-top:12px;"></div>
+</div>
+
+<script>
+function showLogInput(){
+  var type = document.getElementById('challengeType').value;
+  var logInput = document.getElementById('logInput');
+  document.getElementById('result').innerHTML = '';
+
+  if(!type){ 
+    logInput.style.display='none'; 
+    return; 
+  }
+
+  logInput.style.display='block';
+  var label = type==='weekly' 
+      ? 'How many days last week did you eat meat? (0–7)' 
+      : 'How many months did you stay meat-free? (0–12)';
+  document.getElementById('logLabel').innerText = label;
+
+  document.getElementById('logValue').max = type==='weekly'?7:12;
+  document.getElementById('logValue').value = '';
+}
+
+function evaluateChallenge(){
+  var type = document.getElementById('challengeType').value;
+  var val = parseInt(document.getElementById('logValue').value,10);
+  var result = document.getElementById('result');
+
+  if(isNaN(val) || val<0){
+    alert('Enter a valid number');
+    return;
+  }
+
+  var badge='', message='', recipes='';
+
+  if(type==='weekly'){
+    if(val===0) badge='🥇 Gold';
+    else if(val===1) badge='🥈 Silver';
+    else if(val===2) badge='🥉 Bronze';
+    else badge='No badge';
+
+    if(badge==='🥇 Gold') message='Congratulations!! You get a free meal at Greencera restaurant. Keep up the good work!!';
+    else if(badge==='🥈 Silver') message='Congratulations! You get 10% discount at Naitura grocery store!! Let’s see if you can go meatless next week.';
+    else if(badge==='🥉 Bronze') message='Well done! Nice try!! See if you can beat your own score next week!';
+    else message='Keep trying! Log your meals and reduce meat for better impact.';
+
+    recipes+='<p>Try these recipes to maintain a greener diet:</p><ul>';
+    recipes+='<li><a href="https://www.youtube.com/shorts/nVF3YNUMVl4?si=_KRnm46B1aee7LGp" target="_blank">Biryani with egg & salad</a></li>';
+    recipes+='<li><a href="https://www.instagram.com/reel/DPHA9BbCdog/?utm_source=ig_web_copy_link" target="_blank">Idly — healthy Indian breakfast</a></li>';
+    recipes+='<li><a href="https://www.instagram.com/reel/DPGKdmXiexV/?utm_source=ig_web_copy_link" target="_blank">Sprouts salad with veggies</a></li>';
+    recipes+='<li><a href="https://www.instagram.com/reel/DPCJOIhko_-/?utm_source=ig_web_copy_link" target="_blank">Chaat garden healthy snack</a></li></ul>';
+
+  } else { // monthly
+    if(val>=6) badge='🥇 Gold';
+    else if(val>=3) badge='🥈 Silver';
+    else if(val>=1) badge='🥉 Bronze';
+    else badge='No badge';
+
+    if(badge==='🥇 Gold') message='You are a true nature hero. You get premium discounts at every Millionstaste restaurant!';
+    else if(badge==='🥈 Silver') message='Nature loves you!! Wanna try continuing and hitting the gold?';
+    else if(badge==='🥉 Bronze') message='Amazing job!! How are you feeling now? Wanna continue feeling earthy and hitting the silver?';
+    else message='Keep going! Try to stay meat-free next month.';
+
+    recipes+='<p>Maintain your plant-based streak with these recipes:</p><ul>';
+    recipes+='<li><a href="https://www.youtube.com/shorts/nVF3YNUMVl4?si=_KRnm46B1aee7LGp" target="_blank">Biryani with egg & salad</a></li>';
+    recipes+='<li><a href="https://www.instagram.com/reel/DPHA9BbCdog/?utm_source=ig_web_copy_link" target="_blank">Idly — healthy Indian breakfast</a></li>';
+    recipes+='<li><a href="https://www.instagram.com/reel/DPGKdmXiexV/?utm_source=ig_web_copy_link" target="_blank">Sprouts salad with veggies</a></li>';
+    recipes+='<li><a href="https://www.instagram.com/reel/DPCJOIhko_-/?utm_source=ig_web_copy_link" target="_blank">Chaat garden healthy snack</a></li></ul>';
+  }
+
+  result.innerHTML = '<p class="badge">Badge: '+badge+'</p><p>'+message+'</p>'+recipes;
+}
+</script>
+
+</body>
+</html>
