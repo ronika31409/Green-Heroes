@@ -91,7 +91,11 @@
           else{forest='🔥🔥🔥';emojiFace='😭';}
 
           forestDiv.innerHTML=forest;
-          emojiDiv.innerHTML=emojiFace;
+emojiDiv.innerHTML = emojiFace;
+
+// send emoji to ESP32
+fetch("http://192.168.1.38/emoji?face=" + encodeURIComponent(emojiFace))
+  .catch(err => console.log("ESP32 not reachable: " + err));
 
           resultsDiv.innerHTML='<h2>Your Household Impact (This Week)</h2>'
             +'<p>Total meat consumed per year extrapolated: <span class=&quot;highlight&quot;>'+totalKgWeek.toFixed(2)+' kg</span></p>'
@@ -157,3 +161,4 @@ document.getElementById('extraButtons').classList.remove('hidden');
 
 </body>
 </html>
+
