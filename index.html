@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Green Heroes — Meal Impact</title>
+<style>
+body{font-family:Arial,sans-serif;background:#eef8f0;color:#222;padding:12px;margin:0}
+h1{color:#2d7a2d;text-align:center;margin-bottom:6px}
+label{display:block;margin-top:10px;font-weight:600}
+select,button{width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid #cfd9cf;font-size:15px}
+.panel{background:#fff;padding:12px;border-radius:10px;margin-top:12px;box-shadow:0 1px 0 rgba(0,0,0,.04)}
+.big{font-size:18px;font-weight:700}
+.highlight{color:#2d7a2d;font-weight:700}
+.forest{font-size:34px;text-align:center;margin-top:8px}
+.emoji{font-size:42px;text-align:center;margin-top:6px}
+ul{margin:6px 0 0 18px}
+.health-note{background:#f3f7f3;border-left:4px solid #2d7a2d;padding:8px;border-radius:6px;margin-top:6px}
+.statline{margin:4px 0}
+.muted{color:#555;font-size:13px}
+</style>
+</head>
+<body>
+
+<h1>🌍 Green Heroes — Meal Impact</h1>
+
+<div class="panel">
+
+<label>Breakfast</label>
+<select id="breakfast">
+  <option value="">— select —</option>
+  <optgroup label="Veg">
+    <option value="pancake">Pancake</option>
+    <option value="oatmeal">Oatmeal</option>
+    <option value="salad">Salad</option>
+  </optgroup>
+  <optgroup label="Non-Veg">
+    <option value="scrambledEgg">Scrambled Egg</option>
+    <option value="chickenSandwich">Chicken Sandwich</option>
+    <option value="sausage">Sausage</option>
+  </optgroup>
+</select>
+
+<label>Lunch</label>
+<select id="lunch">
+  <option value="">— select —</option>
+  <optgroup label="Veg">
+    <option value="riceVeg">Rice with Veg Curry</option>
+    <option value="pasta">Pasta</option>
+    <option value="quinoaSalad">Quinoa Salad</option>
+  </optgroup>
+  <optgroup label="Non-Veg">
+    <option value="grilledChickenSalad">Grilled Chicken Salad</option>
+    <option value="tunaSandwich">Tuna Sandwich</option>
+    <option value="shrimpNoodles">Shrimp Stir-Fry</option>
+  </optgroup>
+</select>
+
+<label>Snack</label>
+<select id="snack">
+  <option value="">— select —</option>
+  <optgroup label="Veg">
+    <option value="fruits">Fruits</option>
+    <option value="yogurt">Yogurt</option>
+    <option value="popcorn">Popcorn</option>
+  </optgroup>
+  <optgroup label="Non-Veg">
+    <option value="eggSandwich">Egg Sandwich</option>
+    <option value="chickenNuggets">Chicken Nuggets</option>
+    <option value="fishFingers">Fish Fingers</option>
+  </optgroup>
+</select>
+
+<label>Dinner</label>
+<select id="dinner">
+  <option value="">— select —</option>
+  <optgroup label="Veg">
+    <option value="vegLasagna">Veggie Lasagna</option>
+    <option value="tofuRice">Stir-Fried Rice with Tofu</option>
+    <option value="couscousSalad">Couscous Salad</option>
+  </optgroup>
+  <optgroup label="Non-Veg">
+    <option value="fishChips">Fish & Chips</option>
+    <option value="fajitas">Chicken Fajitas</option>
+    <option value="lambKebabs">Lamb Kebabs</option>
+  </optgroup>
+</select>
+
+<button id="calcButton">Calculate Impact</button>
+
+</div>
+
+<div id="dashboard" class="panel"></div>
+<div id="forest" class="forest"></div>
+<div id="emojiFace" class="emoji"></div>
+
+<script>
+var foodDB={
+  pancake:{co2:2,water:800,land:0.5,protein:6,type:'veg',health:'Carb-heavy, best with fruit.'},
+  oatmeal:{co2:1,water:500,land:0.3,protein:5,type:'veg',health:'Great fibre & steady energy.'},
+  salad:{co2:1,water:300,land:0.2,protein:3,type:'veg',health:'Light but low protein.'},
+  scrambledEgg:{co2:4,water:1500,land:1,protein:12,type:'mixed',health:'Nutritious, limit eggs if cholesterol high.'},
+  chickenSandwich:{co2:8,water:4300,land:3.4,protein:20,type:'meat',health:'Lean protein, watch sodium.'},
+  sausage:{co2:12,water:5000,land:4,protein:18,type:'meat',health:'High fat & salt, occasional.'},
+  riceVeg:{co2:3,water:1200,land:0.8,protein:9,type:'veg',health:'Comforting, moderate footprint.'},
+  pasta:{co2:3,water:1000,land:0.7,protein:10,type:'veg',health:'Balanced meal base.'},
+  quinoaSalad:{co2:2,water:900,land:0.6,protein:11,type:'veg',health:'High fibre & protein.'},
+  grilledChickenSalad:{co2:8,water:4300,land:3.5,protein:23,type:'meat',health:'Lean & filling.'},
+  tunaSandwich:{co2:9,water:4000,land:2.5,protein:21,type:'meat',health:'Good omega-3, overfishing risk.'},
+  shrimpNoodles:{co2:10,water:3500,land:2,protein:22,type:'meat',health:'Nutritious if sourced responsibly.'},
+  fruits:{co2:1,water:500,land:0.2,protein:2,type:'veg',health:'Great for vitamins.'},
+  yogurt:{co2:2,water:1000,land:0.5,protein:6,type:'veg',health:'Protein + calcium.'},
+  popcorn:{co2:1,water:300,land:0.1,protein:3,type:'veg',health:'Light snack.'},
+  eggSandwich:{co2:4,water:1500,land:1,protein:12,type:'mixed',health:'Protein-rich quick snack.'},
+  chickenNuggets:{co2:9,water:4200,land:3.2,protein:15,type:'meat',health:'Tasty but processed.'},
+  fishFingers:{co2:7,water:3500,land:2.5,protein:12,type:'meat',health:'Protein but sustainability matters.'},
+  vegLasagna:{co2:4,water:1300,land:0.9,protein:12,type:'veg',health:'Comfort food, moderate impact.'},
+  tofuRice:{co2:2,water:900,land:0.5,protein:10,type:'veg',health:'Low-impact & filling.'},
+  couscousSalad:{co2:2,water:800,land:0.5,protein:8,type:'veg',health:'Light, refreshing.'},
+  fishChips:{co2:12,water:4000,land:3,protein:20,type:'meat',health:'Occasional treat.'},
+  fajitas:{co2:10,water:4500,land:3.8,protein:22,type:'meat',health:'Balanced if not greasy.'},
+  lambKebabs:{co2:25,water:10000,land:12,protein:26,type:'meat',health:'Very high footprint.'}
+};
+
+document.getElementById("calcButton").onclick=function(){
+  var totalCO2=0,totalWater=0,totalLand=0,totalProtein=0;
+  var healthNotes=[];
+  var meals=['breakfast','lunch','snack','dinner'];
+  for(var i=0;i<meals.length;i++){
+    var val=document.getElementById(meals[i]).value;
+    if(!val) continue;
+    var f=foodDB[val];
+    totalCO2+=f.co2; totalWater+=f.water; totalLand+=f.land; totalProtein+=f.protein;
+    if(f.type!=='veg') healthNotes.push(f.health);
+  }
+
+  var html="<h2>🌍 Today's Impact</h2>";
+  html+="<p class='statline big'>CO₂: <span class='highlight'>"+totalCO2.toFixed(1)+"</span> kg</p>";
+  html+="<p class='statline'>Water: <span class='highlight'>"+totalWater+"</span> L</p>";
+  html+="<p class='statline'>Land: <span class='highlight'>"+totalLand.toFixed(1)+"</span> m²</p>";
+  html+="<p class='statline'>Protein: <span class='highlight'>"+totalProtein+"</span> g</p>";
+  html+="<p class='muted'>Equivalent to driving <strong>"+Math.round(totalCO2*4)+" km</strong> or using <strong>"+(totalWater/150).toFixed(1)+" bathtubs</strong> of water.</p>";
+
+  if(healthNotes.length>0){
+    html+="<h3>Health Notes</h3><div class='health-note'><ul>";
+    var uniq=healthNotes.filter(function(value,index,self){return self.indexOf(value)===index;});
+    for(var i=0;i<uniq.length;i++){ html+="<li>"+uniq[i]+"</li>"; }
+    html+="</ul></div>";
+  }
+
+  // ✅ Fixed Meal Suggestions Section
+  html += "<h3>Meal Suggestions & Tips</h3><ul>";
+  if(totalProtein > 50){
+    html += "<li>Light plant-based breakfast, e.g., Oatmeal + Quinoa Salad + Fruits — keep protein moderate.</li>";
+    html += "<li>Low-protein snacks: Popcorn or Salad.</li>";
+    html += "<li>High-fiber veg meals for lunch/dinner.</li>";
+    html += "<li>Reduce meat frequency to balance protein intake.</li>";
+    html += "<a href='https://www.instagram.com/reel/DPGKdmXiexV/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA'>salad</a>";
+  } else if(totalProtein > 30){
+    html += "<li>Moderate protein meals: Pancake + Chicken Sandwich + Yogurt.</li>";
+    html += "<li>Include a salad or veg side for balance.</li>";
+    html += "<li>Snack on Fruits or Popcorn to reduce processed food.</li>";
+    html += "<li>Prefer grilled or baked over fried options.</li>";
+    html += "<a href='https://www.instagram.com/reel/DPGKdmXiexV/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA'>nutritious salad</a>";
+  } else if(totalProtein > 15){
+    html += "<li>Boost protein: Scrambled Egg + Tofu Rice + Egg Sandwich.</li>";
+    html += "<li>Include Quinoa Salad or Yogurt to increase protein.</li>";
+    html += "<li>Choose mixed protein snacks if hungry.</li>";
+    html += "<li>Drink water with meals for better absorption.</li>";
+    html += "<a href='https://www.instagram.com/reel/DPGKdmXiexV/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA'>Salad with protein</a>";
+  } else {
+    html += "<li>Protein-light meals: Pancake + Salad + Fruits.</li>";
+    html += "<li>Add small egg or yogurt snack if possible.</li>";
+    html += "<li>Keep meals mostly plant-based with minimal meat.</li>";
+    html += "<li>Include fiber-rich vegetables for fullness.</li>";
+    html += "<a href='https://www.instagram.com/reel/DPGKdmXiexV/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA'>trythegreatPROTEINsalad</a>";
+  }
+  html += "</ul>";
+
+  // ✅ Update the dashboard with HTML
+  document.getElementById("dashboard").innerHTML = html;
+
+  var score=totalCO2+(totalWater/1000)+(totalLand*2);
+  var emoji="",forest="";
+  if(score<30){emoji="😄";forest="🌳🌲🌳";}
+  else if(score<70){emoji="😐";forest="🌱🌿";}
+  else{emoji="😟";forest="🔥🔥🔥";}
+
+  document.getElementById("emojiFace").innerText=emoji;
+  document.getElementById("forest").innerText=forest;
+};
+</script>
+</body>
+</html>
