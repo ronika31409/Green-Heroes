@@ -14,6 +14,30 @@
     .hidden { display:none; }
     .forest { font-size: 36px; text-align:center; margin-top:10px; }
     .emoji { font-size: 48px; text-align:center; margin-top:10px; }
+.nav-btn {
+  margin: 10px;
+  padding: 12px 20px;
+  background: #2d7a2d;
+  color: #fff;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+  background: #249424;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transform: translateY(-2px);
+}
+
+.nav-btn:active {
+  background: #1e6b1e;
+  transform: translateY(0);
+}
+
   </style>
 </head>
 <body>
@@ -81,6 +105,7 @@
             +'<p class=&quot;highlight&quot;>'+rewardMsg+'</p>';
         }
         resultsDiv.classList.remove('hidden');
+document.getElementById('extraButtons').classList.remove('hidden');
         return false;">
   
   <label>Are you vegetarian or non-vegetarian?</label>
@@ -124,6 +149,11 @@
 <div id="results" class="results hidden"></div>
 <div class="forest" id="forest"></div>
 <div class="emoji" id="emojiFace"></div>
+
+<div id="extraButtons" class="hidden" style="margin-top:20px; text-align:center;">
+  <button class="nav-btn" onclick="window.location.href='https://ronika31409.github.io/Green-Heroes/'">🍽 Meal Planner</button>
+  <button class="nav-btn" onclick="window.location.href='https://ronika31409.github.io/Green-Heroes/GreenHeroesChallenges'">🔥 Challenges</button>
+</div>
 
 </body>
 </html>
