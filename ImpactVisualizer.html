@@ -14,108 +14,30 @@
     .hidden { display:none; }
     .forest { font-size: 36px; text-align:center; margin-top:10px; }
     .emoji { font-size: 48px; text-align:center; margin-top:10px; }
-.nav-btn {
-  margin: 10px;
-  padding: 12px 20px;
-  background: #2d7a2d;
-  color: #fff;
-  border-radius: 8px;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-
-.nav-btn:hover {
-  background: #249424;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  transform: translateY(-2px);
-}
-
-.nav-btn:active {
-  background: #1e6b1e;
-  transform: translateY(0);
-}
-
+    .nav-btn {
+      margin: 10px;
+      padding: 12px 20px;
+      background: #2d7a2d;
+      color: #fff;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    .nav-btn:hover { background: #249424; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transform: translateY(-2px); }
+    .nav-btn:active { background: #1e6b1e; transform: translateY(0); }
   </style>
 </head>
 <body>
 
 <h1>Green Heroes: Impact Visualizer</h1>
 
-<form id="impactForm" 
-      onsubmit="
-        var diet=document.getElementById('diet').value;
-        var totalFamily=parseInt(document.getElementById('familyMembers').value)||1;
-        var resultsDiv=document.getElementById('results');
-        var forestDiv=document.getElementById('forest');
-        var emojiDiv=document.getElementById('emojiFace');
-        if(diet==='veg'){
-          resultsDiv.innerHTML='<p class=&quot;highlight&quot;>Great! Your household is vegetarian. Your meat-related impact is zero.</p>';
-          forestDiv.innerHTML='🌱🌱🌱';
-          emojiDiv.innerHTML='😄';
-        } else {
-          var nonVegMembers=parseInt(document.getElementById('nonVegMembers').value)||1;
-          var freqWeek=parseInt(document.getElementById('frequencyWeek').value)||0;
-          var qtyWeek=parseFloat(document.getElementById('quantityWeek').value)||0;
-          var lastFreqWeek=parseInt(document.getElementById('lastFrequencyWeek').value)||0;
-          var lastQtyWeek=parseFloat(document.getElementById('lastQuantityWeek').value)||0;
-          var contrib=document.getElementById('contribution').value;
-          
-          var totalKgWeek=qtyWeek*freqWeek*52*nonVegMembers;
-          var lastTotalKgWeek=lastQtyWeek*lastFreqWeek*52*nonVegMembers;
-          var reduction=lastTotalKgWeek - totalKgWeek;
-
-          var co2=totalKgWeek*15;
-          var water=totalKgWeek*15000;
-          var land=totalKgWeek*3;
-          var heartRisk=((qtyWeek*freqWeek*nonVegMembers)/10).toFixed(1);
-          var cancerRisk=((qtyWeek*freqWeek*nonVegMembers)/20).toFixed(1);
-          var msgs=[];
-          msgs.push(co2<100?'🌍 CO₂: Small impact, but every bit counts!':co2<500?'🌍 CO₂: Same as driving a car ~40 km.':co2<1000?'🌍 CO₂: Enough to drive a small car 80-100 km!':'🌍 CO₂: Very high! Could cause lung & climate effects.');
-          msgs.push(water<5000?'💧 Water: Small amount, but you can save more!':water<50000?'💧 Water: Enough for 25 people for a day!':water<150000?'💧 Water: Enough for 1 person for a year!':'💧 Water: Could supply a small town for a week!');
-          msgs.push(land<50?'🌾 Land: Very small impact.':land<150?'🌾 Land: About the size of a small apartment floor.':land<500?'🌾 Land: Could plant 100 trees!':'🌾 Land: Equivalent to a large farm area!');
-          var suggestion=totalKgWeek<=10?'✅ Great! Keep reducing meat gradually.':totalKgWeek<=30?'⚠ Moderate impact. Try substituting some meals with pulses.':'❌ High impact! Consider cutting down meat significantly for health & environment.';
-          
-          // Discount only if significant reduction
-          var rewardMsg='';
-          if(reduction>10){ // arbitrary threshold: >10kg reduction
-            rewardMsg='🎉 Congrats! You cut down your meat consumption this week and earned a 10% discount at MillionsTaste!';
-          }
-
-          var forest='',emojiFace='';
-          if(totalKgWeek<=10){forest='🌲🌳🌲';emojiFace='😄';}
-          else if(totalKgWeek<=30){forest='🌱🌳🌱';emojiFace='😐';}
-          else if(totalKgWeek<=50){forest='🌱🌱🌱';emojiFace='😟';}
-          else{forest='🔥🔥🔥';emojiFace='😭';}
-
-          forestDiv.innerHTML=forest;
-emojiDiv.innerHTML = emojiFace;
-
-// send emoji to ESP32
-fetch("http://192.168.1.38/emoji?face=" + encodeURIComponent(emojiFace))
-  .catch(err => console.log("ESP32 not reachable: " + err));
-
-          resultsDiv.innerHTML='<h2>Your Household Impact (This Week)</h2>'
-            +'<p>Total meat consumed per year extrapolated: <span class=&quot;highlight&quot;>'+totalKgWeek.toFixed(2)+' kg</span></p>'
-            +'<p>🌍 CO₂ emitted: <span class=&quot;highlight&quot;>'+co2.toFixed(0)+' kg</span></p>'
-            +'<p>💧 Water used: <span class=&quot;highlight&quot;>'+water.toLocaleString()+' liters</span></p>'
-            +'<p>🌾 Land used: <span class=&quot;highlight&quot;>'+land.toFixed(0)+' m²</span></p>'
-            +'<p>Health risk: Heart disease +'+heartRisk+'%, Cancer +'+cancerRisk+'%</p>'
-            +'<p>Contribution goal: <span class=&quot;highlight&quot;>'+contrib+'</span></p>'
-            +'<p>Impact insights:</p><ul><li>'+msgs[0]+'</li><li>'+msgs[1]+'</li><li>'+msgs[2]+'</li></ul>'
-            +'<p class=&quot;highlight&quot;>'+suggestion+'</p>'
-            +'<p class=&quot;highlight&quot;>'+rewardMsg+'</p>';
-        }
-        resultsDiv.classList.remove('hidden');
-document.getElementById('extraButtons').classList.remove('hidden');
-        return false;">
-  
+<form id="impactForm">
   <label>Are you vegetarian or non-vegetarian?</label>
   <select name="diet" id="diet" onchange="
-      var f=document.getElementById('nonVegFields');
-      if(this.value==='nonveg'){f.classList.remove('hidden');}else{f.classList.add('hidden');}">
+      document.getElementById('nonVegFields').classList.toggle('hidden', this.value==='veg');">
     <option value="veg">Vegetarian</option>
     <option value="nonveg">Non-Vegetarian</option>
   </select>
@@ -159,6 +81,82 @@ document.getElementById('extraButtons').classList.remove('hidden');
   <button class="nav-btn" onclick="window.location.href='https://ronika31409.github.io/Green-Heroes/GreenHeroesChallenges'">🔥 Challenges</button>
 </div>
 
+<script>
+const ESP32_IP = "192.168.1.37"; // Replace with your ESP32 IP
+
+document.getElementById("impactForm").onsubmit = async function(e) {
+  e.preventDefault();
+
+  const diet = document.getElementById('diet').value;
+  const totalFamily = parseInt(document.getElementById('familyMembers').value) || 1;
+  const resultsDiv = document.getElementById('results');
+  const forestDiv = document.getElementById('forest');
+  const emojiDiv = document.getElementById('emojiFace');
+
+  let emojiFace = "";
+  let forest = "";
+  let msgs = [];
+  let suggestion = "";
+  let rewardMsg = "";
+
+  if(diet === "veg") {
+    emojiFace = "😄"; forest = "🌱🌱🌱";
+    resultsDiv.innerHTML = '<p class="highlight">Great! Your household is vegetarian. Your meat-related impact is zero.</p>';
+  } else {
+    const nonVegMembers = parseInt(document.getElementById('nonVegMembers').value)||1;
+    const freqWeek = parseInt(document.getElementById('frequencyWeek').value)||0;
+    const qtyWeek = parseFloat(document.getElementById('quantityWeek').value)||0;
+    const lastFreqWeek = parseInt(document.getElementById('lastFrequencyWeek').value)||0;
+    const lastQtyWeek = parseFloat(document.getElementById('lastQuantityWeek').value)||0;
+    const contrib = document.getElementById('contribution').value;
+
+    const totalKgWeek = qtyWeek*freqWeek*52*nonVegMembers;
+    const lastTotalKgWeek = lastQtyWeek*lastFreqWeek*52*nonVegMembers;
+    const reduction = lastTotalKgWeek - totalKgWeek;
+
+    const co2 = totalKgWeek*15;
+    const water = totalKgWeek*15000;
+    const land = totalKgWeek*3;
+    const heartRisk = ((qtyWeek*freqWeek*nonVegMembers)/10).toFixed(1);
+    const cancerRisk = ((qtyWeek*freqWeek*nonVegMembers)/20).toFixed(1);
+
+    msgs.push(co2<100?'🌍 CO₂: Small impact, but every bit counts!':co2<500?'🌍 CO₂: Same as driving a car ~40 km.':co2<1000?'🌍 CO₂: Enough to drive a small car 80-100 km!':'🌍 CO₂: Very high! Could cause lung & climate effects.');
+    msgs.push(water<5000?'💧 Water: Small amount, but you can save more!':water<50000?'💧 Water: Enough for 25 people for a day!':water<150000?'💧 Water: Enough for 1 person for a year!':'💧 Water: Could supply a small town for a week!');
+    msgs.push(land<50?'🌾 Land: Very small impact.':land<150?'🌾 Land: About the size of a small apartment floor.':land<500?'🌾 Land: Could plant 100 trees!':'🌾 Land: Equivalent to a large farm area!');
+
+    suggestion = totalKgWeek<=10?'✅ Great! Keep reducing meat gradually.':totalKgWeek<=30?'⚠ Moderate impact. Try substituting some meals with pulses.':'❌ High impact! Consider cutting down meat significantly for health & environment.';
+    if(reduction>10) rewardMsg='🎉 Congrats! You cut down your meat consumption this week and earned a 10% discount at MillionsTaste!';
+
+    if(totalKgWeek<=10){forest='🌲🌳🌲'; emojiFace='😄';}
+    else if(totalKgWeek<=30){forest='🌱🌳🌱'; emojiFace='😐';}
+    else if(totalKgWeek<=50){forest='🌱🌱🌱'; emojiFace='😟';}
+    else {forest='🔥🔥🔥'; emojiFace='😭';}
+
+    resultsDiv.innerHTML = `<h2>Your Household Impact (This Week)</h2>
+      <p>Total meat consumed per year extrapolated: <span class="highlight">${totalKgWeek.toFixed(2)} kg</span></p>
+      <p>🌍 CO₂ emitted: <span class="highlight">${co2.toFixed(0)} kg</span></p>
+      <p>💧 Water used: <span class="highlight">${water.toLocaleString()} liters</span></p>
+      <p>🌾 Land used: <span class="highlight">${land.toFixed(0)} m²</span></p>
+      <p>Health risk: Heart disease +${heartRisk}%, Cancer +${cancerRisk}%</p>
+      <p>Contribution goal: <span class="highlight">${contrib}</span></p>
+      <p>Impact insights:</p><ul><li>${msgs[0]}</li><li>${msgs[1]}</li><li>${msgs[2]}</li></ul>
+      <p class="highlight">${suggestion}</p>
+      <p class="highlight">${rewardMsg}</p>`;
+  }
+
+  forestDiv.innerHTML = forest;
+  emojiDiv.innerHTML = emojiFace;
+  resultsDiv.classList.remove('hidden');
+  document.getElementById('extraButtons').classList.remove('hidden');
+
+  // Send emoji to ESP32 TFT
+  try {
+    await fetch(`http://${ESP32_IP}/emoji?face=${encodeURIComponent(emojiFace)}`);
+  } catch(err) {
+    console.log("ESP32 not reachable:", err);
+  }
+};
+</script>
+
 </body>
 </html>
-
